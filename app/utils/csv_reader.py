@@ -126,8 +126,21 @@ def remove_gral_rows(df: pd.DataFrame) -> pd.DataFrame:
         lambda row: any(pat in value for pat in patterns for value in row), axis=1
     )
 
+    # Eliminar filas con poca información y sin COD_CTA_FMT
+    pk_col = settings.pk_column
+    filled_counts = df_str.apply(
+        lambda row: sum(
+            value.strip() != "" and value.lower() != "nan" for value in row
+        ),
+        axis=1,
+    )
+    missing_pk = df_str[pk_col].str.strip().eq("") | df_str[pk_col].str.lower().eq(
+        "nan"
+    )
+    sparse_row = (filled_counts <= 5) & missing_pk
+
     # Filtrar esas filas
-    return df[~mask].copy()
+    return df[~(mask | sparse_row)].copy()
 
 
 def validate_dataframe_columns(df: pd.DataFrame, filename: str) -> None:
