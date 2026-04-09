@@ -203,14 +203,30 @@ def compare_dataframes(
         f"  - ELIMINADAS: {len(df_completa[df_completa['ESTADO_CUENTA'] == 'ELIMINADA'])}"
     )
 
-    # PASO 8: Generar DataFrame de solo existentes
+    # PASO 8: Generar DataFrame de solo existentes (sin ESTADO_CUENTA)
     df_existentes = df_completa[df_completa["ESTADO_CUENTA"] == "EXISTENTE"].copy()
+    if "ESTADO_CUENTA" in df_existentes.columns:
+        df_existentes = df_existentes.drop(columns=["ESTADO_CUENTA"])
 
     print(f"Registros con diferencia (solo existentes): {len(df_existentes)}")
 
-    # PASO 9: Ordenar por COD_CTA_FMT
-    df_completa = df_completa.sort_values(pk_col).reset_index(drop=True)
-    df_existentes = df_existentes.sort_values(pk_col).reset_index(drop=True)
+    # PASO 9: Ordenar por COD_CTA_SAFYC (numérico)
+    sort_col = "COD_CTA_SAFYC"
+    if sort_col in df_completa.columns:
+        df_completa = df_completa.sort_values(
+            by=sort_col,
+            key=lambda s: pd.to_numeric(s, errors="coerce"),
+        ).reset_index(drop=True)
+    else:
+        df_completa = df_completa.sort_values(pk_col).reset_index(drop=True)
+
+    if sort_col in df_existentes.columns:
+        df_existentes = df_existentes.sort_values(
+            by=sort_col,
+            key=lambda s: pd.to_numeric(s, errors="coerce"),
+        ).reset_index(drop=True)
+    else:
+        df_existentes = df_existentes.sort_values(pk_col).reset_index(drop=True)
 
     return df_completa, df_existentes
 

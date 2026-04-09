@@ -77,7 +77,10 @@ async def read_csv_file(file: UploadFile) -> Tuple[pd.DataFrame, str]:
             f"Se esperaba encoding latin1: {str(e)}"
         )
 
-    # 5. Validar que exista la columna PK
+    # 5. Limpiar filas no deseadas (totales GRAL)
+    df = remove_gral_rows(df)
+
+    # 6. Validar que exista la columna PK
     pk_col = settings.pk_column
     if pk_col not in df.columns:
         raise KeyError(
@@ -85,11 +88,11 @@ async def read_csv_file(file: UploadFile) -> Tuple[pd.DataFrame, str]:
             f"Columnas encontradas: {list(df.columns)}"
         )
 
-    # 6. Convertir columnas numéricas
+    # 7. Convertir columnas numéricas
     numeric_cols = settings.numeric_columns
     df = convert_dataframe_numeric_columns(df, numeric_cols)
 
-    # 7. Validar columnas requeridas (warning si faltan, pero continuar)
+    # 8. Validar columnas requeridas (warning si faltan, pero continuar)
     required_cols = set(settings.columns_csv + numeric_cols + [pk_col])
     missing_cols = required_cols - set(df.columns)
 
@@ -98,6 +101,33 @@ async def read_csv_file(file: UploadFile) -> Tuple[pd.DataFrame, str]:
         print(f"Advertencia: Columnas faltantes en '{file.filename}': {missing_cols}")
 
     return df, year
+
+
+def remove_gral_rows(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Elimina filas de totales/encabezados agregados al final del CSV.
+
+    Estas filas suelen contener textos como:
+    - SALDO_INI_GRAL
+    - INGRESO_GRAL
+    - EGRESO_GRAL
+    - SALDO_FIN_GRAL
+    - CF_PROVINCIA
+    """
+    if df.empty:
+        return df
+
+    # Convertir a string para buscar patrones
+    df_str = df.astype(str)
+    patterns = ["GRAL", "CF_PROVINCIA", "SALDO_INI_GRAL"]
+
+    # Marcar filas que contengan cualquiera de los patrones
+    mask = df_str.apply(
+        lambda row: any(pat in value for pat in patterns for value in row), axis=1
+    )
+
+    # Filtrar esas filas
+    return df[~mask].copy()
 
 
 def validate_dataframe_columns(df: pd.DataFrame, filename: str) -> None:

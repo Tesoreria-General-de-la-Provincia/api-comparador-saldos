@@ -4,7 +4,7 @@ Módulo para generar archivos Excel desde DataFrames.
 
 import pandas as pd
 from openpyxl import Workbook
-from openpyxl.styles import Font, Alignment
+from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 from openpyxl.utils.dataframe import dataframe_to_rows
 from io import BytesIO
 import numpy as np
@@ -38,16 +38,39 @@ def dataframe_to_excel_bytes(df: pd.DataFrame, sheet_name: str = "Sheet1") -> by
     ws = wb.active
     ws.title = sheet_name
 
+    # Estilos
+    header_fill = PatternFill(
+        start_color="9DC3E6", end_color="9DC3E6", fill_type="solid"
+    )
+    header_font = Font(bold=True)
+    zebra_fill = PatternFill(
+        start_color="DDEBF7", end_color="DDEBF7", fill_type="solid"
+    )
+    safyc_fill = PatternFill(
+        start_color="FFF2CC", end_color="FFF2CC", fill_type="solid"
+    )
+    border_side = Side(style="thin", color="000000")
+    cell_border = Border(
+        left=border_side, right=border_side, top=border_side, bottom=border_side
+    )
+
     # Escribir headers (primera fila)
     headers = list(df.columns)
     for col_idx, header in enumerate(headers, start=1):
         cell = ws.cell(row=1, column=col_idx)
         cell.value = header
-        cell.font = Font(bold=True)
+        cell.font = header_font
         cell.alignment = Alignment(horizontal="center", vertical="center")
+        cell.fill = header_fill
+        cell.border = cell_border
 
     # Escribir datos (desde fila 2)
+    safyc_col_idx = None
+    if "COD_CTA_SAFYC" in headers:
+        safyc_col_idx = headers.index("COD_CTA_SAFYC") + 1
+
     for row_idx, row_data in enumerate(df.itertuples(index=False), start=2):
+        apply_zebra = row_idx % 2 == 0
         for col_idx, value in enumerate(row_data, start=1):
             cell = ws.cell(row=row_idx, column=col_idx)
 
@@ -69,6 +92,17 @@ def dataframe_to_excel_bytes(df: pd.DataFrame, sheet_name: str = "Sheet1") -> by
             # Valores string
             else:
                 cell.value = str(value)
+
+            # Bordes para cuadrantes
+            cell.border = cell_border
+
+            # Zebra striping
+            if apply_zebra:
+                cell.fill = zebra_fill
+
+            # Resaltar columna COD_CTA_SAFYC
+            if safyc_col_idx == col_idx:
+                cell.fill = safyc_fill
 
     # Ajustar ancho de columnas automáticamente
     for column_cells in ws.columns:
