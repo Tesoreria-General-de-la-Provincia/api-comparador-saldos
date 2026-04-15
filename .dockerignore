@@ -1,0 +1,11 @@
+.git/
+.venv/
+venv/
+__pycache__/
+.ruff_cache/
+.pytest_cache/
+test_output/
+target/
+*.zip
+*.xlsx
+*.pyc

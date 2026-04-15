@@ -6,6 +6,7 @@ Aplicación FastAPI para comparar saldos bancarios entre diferentes años.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
+from fastapi.responses import JSONResponse
 import logging
 
 from app.api.endpoints import router
@@ -59,8 +60,9 @@ app = FastAPI(
 # Configurar CORS para permitir peticiones desde cualquier origen
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # En producción, especificar orígenes permitidos
-    allow_credentials=True,
+    allow_origins=["*"],
+    # Sin credenciales, '*' es válido y habilita CORS abierto.
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -134,7 +136,10 @@ async def global_exception_handler(request, exc):
     Manejador global de excepciones no capturadas.
     """
     logger.error(f"Error no manejado: {exc}", exc_info=True)
-    return {"detail": "Error interno del servidor", "type": type(exc).__name__}
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Error interno del servidor", "type": type(exc).__name__},
+    )
 
 
 if __name__ == "__main__":

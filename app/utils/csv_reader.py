@@ -117,20 +117,25 @@ def remove_gral_rows(df: pd.DataFrame) -> pd.DataFrame:
     if df.empty:
         return df
 
-    # Convertir a string para buscar patrones
-    df_str = df.astype(str)
+    # Normalizar a string de forma segura (evita NaN/float en búsquedas y strip)
+    df_str = df.fillna("").astype(str)
     patterns = ["GRAL", "CF_PROVINCIA", "SALDO_INI_GRAL"]
 
     # Marcar filas que contengan cualquiera de los patrones
     mask = df_str.apply(
-        lambda row: any(pat in value for pat in patterns for value in row), axis=1
+        lambda row: any(pat in value for pat in patterns for value in row.values),
+        axis=1,
     )
 
     # Eliminar filas con poca información y sin COD_CTA_FMT
     pk_col = settings.pk_column
+    if pk_col not in df_str.columns:
+        # Si no existe PK todavía, al menos filtramos filas de totales/encabezados.
+        return df[~mask].copy()
+
     filled_counts = df_str.apply(
         lambda row: sum(
-            value.strip() != "" and value.lower() != "nan" for value in row
+            value.strip() != "" and value.lower() != "nan" for value in row.values
         ),
         axis=1,
     )
