@@ -57,6 +57,10 @@ body {
     margin: 0 auto;
 }
 
+.curator-header {
+    text-align: center;
+}
+
 /* Typography */
 .serif-title {
     font-family: var(--font-serif);
@@ -74,6 +78,8 @@ body {
     color: var(--on-surface-variant);
     font-weight: 300;
     max-width: 65ch;
+    margin-left: auto;
+    margin-right: auto;
     margin-bottom: 4rem;
 }
 
@@ -86,6 +92,7 @@ body {
     color: var(--on-surface-variant);
     margin-bottom: 0.75rem;
     display: block;
+    text-align: center;
 }
 
 /* Forms and Dropzones */
@@ -122,8 +129,8 @@ body {
 
 .drop-surface {
     background-color: var(--surface-lowest);
-    box-shadow: inset 0 0 0 1px var(--ghost-border);
-    padding: 3rem 2rem;
+    border: 2px dashed rgba(17, 24, 39, 0.25);
+    padding: 2rem;
     border-radius: var(--rad-md);
     text-align: center;
     transition: all 0.3s ease;
@@ -131,7 +138,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 180px;
+    min-height: 120px;
 }
 
 /* Tonal shift for hover, no borders changed */
@@ -141,22 +148,22 @@ body {
 
 .file-dropzone.dragover .drop-surface {
     background-color: var(--primary-container);
-    box-shadow: inset 0 0 0 2px var(--primary-ghost);
+    border-color: rgba(9, 76, 178, 0.4);
 }
 
 .file-desc {
     font-family: var(--font-inter);
-    font-size: 1rem;
+    font-size: 1.15rem;
     color: var(--on-surface-variant);
-    font-weight: 400;
+    font-weight: 500;
 }
 
 .file-name {
     font-family: var(--font-public);
     margin-top: 1rem;
-    font-size: 0.9rem;
+    font-size: 1.15rem;
     color: var(--primary);
-    font-weight: 500;
+    font-weight: 600;
     word-break: break-all;
 }
 
@@ -172,6 +179,7 @@ body {
 .actions {
     margin-top: 1rem;
     display: flex;
+    justify-content: center;
 }
 
 .btn-primary {
