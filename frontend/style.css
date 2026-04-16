@@ -138,7 +138,9 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 120px;
+    height: 130px;
+    width: 100%;
+    overflow: hidden;
 }
 
 /* Tonal shift for hover, no borders changed */
@@ -160,11 +162,14 @@ body {
 
 .file-name {
     font-family: var(--font-public);
-    margin-top: 1rem;
     font-size: 1.15rem;
     color: var(--primary);
     font-weight: 600;
-    word-break: break-all;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: block;
 }
 
 .file-dropzone.has-file .drop-surface {

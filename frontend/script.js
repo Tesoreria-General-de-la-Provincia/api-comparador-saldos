@@ -26,10 +26,9 @@ document.addEventListener('DOMContentLoaded', () => {
     inputs.forEach(item => {
         const { input, dropzone, nameDisplay } = item;
 
-        // Click on dropzone triggers file input
-        dropzone.addEventListener('click', () => {
-            input.click();
-        });
+        // Note: We don't add a click listener to dropzone because the native 
+        // <label for="..."> already handles opening the file dialog.
+        // Adding one would cause a double-click bug.
 
         // File selection event
         input.addEventListener('change', (e) => {
