@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.responses import JSONResponse
 import logging
+from scalar_fastapi import get_scalar_api_reference
 
 from app.api.endpoints import router
 
@@ -78,6 +79,17 @@ async def root():
     Redirige a la documentación Swagger UI.
     """
     return RedirectResponse(url="/docs")
+
+
+@app.get("/scalar", include_in_schema=False)
+async def scalar_html():
+    """
+    Documentación alternativa con Scalar.
+    """
+    return get_scalar_api_reference(
+        openapi_url=app.openapi_url,
+        title=app.title,
+    )
 
 
 @app.get("/health", tags=["Health"])

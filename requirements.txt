@@ -4,3 +4,4 @@ python-multipart==0.0.6
 pandas==2.1.4
 openpyxl==3.1.2
 numpy==1.26.3
+scalar-fastapi==1.0.3
