@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // UI Elements
     const form = document.getElementById('compare-form');
     const submitBtn = document.getElementById('submit-btn');
-    const statusMessage = document.getElementById('status-message');
     const errorMessage = document.getElementById('error-message');
     
     // File inputs and their UI wrappers
@@ -104,11 +103,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function setLoading(isLoading) {
         if (isLoading) {
             submitBtn.disabled = true;
-            statusMessage.classList.remove('hidden');
+            submitBtn.textContent = 'Curando registros...';
             hideError();
         } else {
             submitBtn.disabled = false;
-            statusMessage.classList.add('hidden');
+            submitBtn.textContent = 'Proceder a la Comparación';
         }
     }
 
