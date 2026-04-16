@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparador de Saldos TGP</title>
+    <meta name="description" content="Comparador automático de saldos de Tesorería General de la Provincia mediante archivos CSV.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-elements">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <main class="container">
+        <header>
+            <div class="icon-container">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+            </div>
+            <h1>Comparador de Saldos <span class="highlight">TGP</span></h1>
+            <p>Sube los archivos CSV de diferentes años para generar los reportes de comparación.</p>
+        </header>
+
+        <form id="compare-form" class="upload-form">
+            <div class="form-grid">
+                <!-- Dropzone 1 -->
+                <div class="file-dropzone" id="dropzone-1">
+                    <input type="file" id="file_year1" name="file_year1" accept=".csv" required class="file-input">
+                    <label for="file_year1" class="file-label">
+                        <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <span class="file-title">Año Anterior</span>
+                        <span class="file-desc">Selecciona o arrastra el CSV</span>
+                        <span class="file-name" id="name-1"></span>
+                    </label>
+                </div>
+
+                <div class="vs-badge">VS</div>
+
+                <!-- Dropzone 2 -->
+                <div class="file-dropzone" id="dropzone-2">
+                    <input type="file" id="file_year2" name="file_year2" accept=".csv" required class="file-input">
+                    <label for="file_year2" class="file-label">
+                        <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <span class="file-title">Año Actual</span>
+                        <span class="file-desc">Selecciona o arrastra el CSV</span>
+                        <span class="file-name" id="name-2"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button type="submit" id="submit-btn" class="btn-primary">
+                    <span class="btn-text">Comparar Archivos</span>
+                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </button>
+            </div>
+            
+            <div id="status-message" class="status-message hidden">
+                <div class="loader"></div>
+                <span>Procesando archivos, esto puede tardar unos segundos...</span>
+            </div>
+            <div id="error-message" class="error-message hidden"></div>
+        </form>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
