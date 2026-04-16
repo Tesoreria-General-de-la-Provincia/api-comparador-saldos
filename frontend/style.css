@@ -116,6 +116,7 @@ body {
 
 .file-dropzone {
     flex: 1;
+    min-width: 0;
 }
 
 .file-input {
@@ -128,6 +129,7 @@ body {
 }
 
 .drop-surface {
+    position: relative;
     background-color: var(--surface-lowest);
     border: 2px dashed rgba(17, 24, 39, 0.25);
     padding: 2rem;
@@ -169,11 +171,39 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
+    width: 100%;
+    text-align: center;
     display: block;
 }
 
 .file-dropzone.has-file .drop-surface {
     background-color: var(--surface-dim);
+}
+
+.remove-file-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    color: var(--on-surface-variant);
+    padding: 0.5rem;
+    border-radius: var(--rad-full);
+    display: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.remove-file-btn:hover {
+    color: #991b1b;
+    background-color: rgba(153, 27, 27, 0.1);
+}
+
+.file-dropzone.has-file .remove-file-btn {
+    display: flex;
 }
 
 .file-dropzone.has-file .file-desc {

@@ -13,22 +13,32 @@ document.addEventListener('DOMContentLoaded', () => {
         {
             input: document.getElementById('file_year1'),
             dropzone: document.getElementById('dropzone-1'),
-            nameDisplay: document.getElementById('name-1')
+            nameDisplay: document.getElementById('name-1'),
+            removeBtn: document.getElementById('remove-1')
         },
         {
             input: document.getElementById('file_year2'),
             dropzone: document.getElementById('dropzone-2'),
-            nameDisplay: document.getElementById('name-2')
+            nameDisplay: document.getElementById('name-2'),
+            removeBtn: document.getElementById('remove-2')
         }
     ];
 
     // Setup drag & drop and file selection for each input
     inputs.forEach(item => {
-        const { input, dropzone, nameDisplay } = item;
+        const { input, dropzone, nameDisplay, removeBtn } = item;
 
         // Note: We don't add a click listener to dropzone because the native 
         // <label for="..."> already handles opening the file dialog.
         // Adding one would cause a double-click bug.
+
+        // Remove button event
+        removeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            input.value = '';
+            handleFileSelection([], dropzone, nameDisplay);
+        });
 
         // File selection event
         input.addEventListener('change', (e) => {
