@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  api:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: comparador-saldos-api
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Montamos el código fuente para hot-reload y tener persistencia local de cualquier archivo o logs
+      - .:/app
+    restart: unless-stopped
