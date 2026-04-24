@@ -1,7 +1,7 @@
 # API Comparador de Saldos TGP
 
 API REST desarrollada en FastAPI para comparar saldos bancarios entre diferentes años a partir de archivos CSV.
-a
+
 ## 📋 Características
 
 - ✅ Compara 2 archivos CSV de diferentes años
