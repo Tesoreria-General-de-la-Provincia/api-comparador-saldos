@@ -283,3 +283,240 @@ body {
 .hidden {
     display: none !important;
 }
+
+/* Download container and file cards (improved layout) */
+#download-buttons {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: stretch;
+  background: var(--surface-lowest, #fff);
+  border-radius: 10px;
+  padding: 14px;
+  box-shadow: 0 6px 18px rgba(12, 24, 40, 0.06);
+  border: 1px solid rgba(12, 24, 40, 0.04);
+}
+
+#download-buttons .small-heading {
+  margin: 0 0 8px 0;
+  font-size: 0.95rem;
+  color: var(--on-surface-variant, #263238);
+  font-weight: 600;
+}
+
+.download-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.file-card {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(250,250,250,0.6));
+  border-radius: 8px;
+  border: 1px solid rgba(12, 24, 40, 0.03);
+}
+
+/* file-meta not used in compact button layout; kept for backwards compatibility */
+.file-meta {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.file-icon {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 120, 212, 0.08);
+  border-radius: 6px;
+  color: var(--primary, #0078d4);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.file-name {
+  font-size: 0.95rem;
+  color: #0b2433;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-size {
+  font-size: 0.82rem;
+  color: #6b7680;
+  margin-left: 6px;
+}
+
+.file-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-download {
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  text-decoration: none;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-start; /* left align text so filename is readable */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 720px) {
+  .download-grid {
+    grid-template-columns: 1fr;
+  }
+  #download-buttons {
+    padding: 12px;
+  }
+}
+
+/* Modal overlay & dialog (centrado) */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 12, 18, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.modal-dialog {
+  width: 100%;
+  max-width: 520px; /* compact card width */
+  background: var(--surface-lowest, #fff);
+  border-radius: 12px;
+  box-shadow: 0 18px 40px rgba(8, 20, 40, 0.24);
+  padding: 18px;
+  border: 1px solid rgba(12, 24, 40, 0.05);
+  transform-origin: center center;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.modal-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--on-surface);
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  font-size: 1rem;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--on-surface-variant);
+}
+
+.modal-body {
+  max-height: calc(100vh - 180px);
+  overflow: auto;
+  padding-right: 6px; /* small gutter for scrollbar */
+}
+
+.modal-body .download-grid {
+  justify-items: stretch;
+}
+
+/* New compact vertical rows with icon + name on left and Download button on right */
+.download-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.file-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ffffff, #fbfbfb);
+  border: 1px solid rgba(12, 24, 40, 0.04);
+}
+
+.file-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.file-icon {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: rgba(9,76,178,0.08);
+  color: var(--primary, #094cb2);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.file-name {
+  font-size: 0.98rem;
+  color: #0b2433;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-download {
+  min-width: 140px;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  font-weight: 600;
+  text-decoration: none;
+  background: var(--primary-gradient);
+  color: var(--on-primary);
+  border: none;
+  cursor: pointer;
+  transition: transform .12s ease, opacity .12s ease;
+}
+
+.btn-download:hover { transform: translateY(-2px); opacity: 0.98; }
+
+@media (max-width: 520px) {
+  .file-row { flex-direction: column; align-items: stretch; }
+  .btn-download { width: 100%; }
+}
+
+body.modal-open {
+  overflow: hidden;
+}

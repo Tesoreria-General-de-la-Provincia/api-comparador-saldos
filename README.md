@@ -34,10 +34,7 @@ uvicorn main:app --reload
 | `file_year1` | file | CSV del año anterior (ej: `2025.CSV`) |
 | `file_year2` | file | CSV del año actual (ej: `2026.CSV`) |
 
-**Respuesta:** `application/zip` con dos archivos Excel:
-
-- `comparacion_completa.xlsx` — todas las cuentas con diferencia (NUEVA / EXISTENTE / ELIMINADA)
-- `comparacion_existentes.xlsx` — solo cuentas que existían en ambos años
+**Respuesta:** JSON con ambos archivos Excel codificados en base64. La respuesta contiene `files` con objetos `{name, mime, content_base64}` que el frontend puede decodificar y ofrecer para descarga.
 
 ```bash
 curl -X POST http://localhost:8000/api/compare \
