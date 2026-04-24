@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // API Configuration
-    const API_URL = 'http://localhost:8000/api/compare';
+    const API_URL = 'http://10.6.10.157:8075/api/compare';
 
     // UI Elements
     const form = document.getElementById('compare-form');
@@ -164,6 +164,29 @@ document.addEventListener('DOMContentLoaded', () => {
         return backdrop;
     }
 
+    function getFileMeta(fileName) {
+        const normalized = (fileName || '').toLowerCase();
+
+        if (normalized.includes('completa') || normalized.includes('completo')) {
+            return {
+                title: 'Saldos completos',
+                description: 'Incluye cuentas nuevas, vigentes y cerradas.'
+            };
+        }
+
+        if (normalized.includes('existentes')) {
+            return {
+                title: 'Comparacion existentes',
+                description: 'Incluye solo cuentas vigentes en ambos años.'
+            };
+        }
+
+        return {
+            title: fileName,
+            description: 'Archivo generado por el comparador.'
+        };
+    }
+
     function showModal(files) {
         const backdrop = createModalElements();
         const body = backdrop.querySelector('.modal-body');
@@ -175,6 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         files.forEach(file => {
             const { name, mime, content_base64 } = file;
+            const meta = getFileMeta(name);
             // decode base64
             const binaryString = atob(content_base64);
             const len = binaryString.length;
@@ -199,12 +223,17 @@ document.addEventListener('DOMContentLoaded', () => {
             // small SVG icon for xlsx (simple shape)
             icon.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M7 8h10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 12h10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
-            const nameEl = document.createElement('div');
-            nameEl.className = 'file-name';
-            nameEl.textContent = name;
+            const titleEl = document.createElement('div');
+            titleEl.className = 'file-title';
+            titleEl.textContent = meta.title || name;
+
+            const descEl = document.createElement('div');
+            descEl.className = 'file-description';
+            descEl.textContent = meta.description;
 
             left.appendChild(icon);
-            left.appendChild(nameEl);
+            left.appendChild(titleEl);
+            left.appendChild(descEl);
 
             // Right: download button
             const btn = document.createElement('a');
