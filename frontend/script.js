@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // API Configuration
     const API_URL = '/api/compare';
 
+
     // UI Elements
     const form = document.getElementById('compare-form');
     const submitBtn = document.getElementById('submit-btn');
