@@ -1,0 +1,285 @@
+:root {
+    /* Colors - Alexandria High-End Editorial */
+    --primary: #094cb2;
+    --primary-container: #d9e6fd;
+    --primary-gradient: linear-gradient(135deg, #094cb2, #1e60c8);
+    --tertiary: #6d5e00;
+    
+    /* Surfaces */
+    --surface-lowest: #ffffff;
+    --surface-default: #fcfcfc;
+    --surface-high: #f2f4f7;
+    --surface-dim: #e9ecef;
+    
+    /* Text */
+    --on-surface: #111827;
+    --on-surface-variant: #4b5563;
+    --on-primary: #ffffff;
+    
+    /* Outlines / Ghost Border */
+    --ghost-border: rgba(17, 24, 39, 0.15);
+    --primary-ghost: rgba(9, 76, 178, 0.25);
+    
+    /* Fonts */
+    --font-serif: 'Noto Serif', serif;
+    --font-inter: 'Inter', sans-serif;
+    --font-public: 'Public Sans', sans-serif;
+    
+    /* Radii */
+    --rad-sm: 8px;
+    --rad-md: 12px;
+    --rad-lg: 24px;
+    --rad-full: 9999px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--surface-default);
+    color: var(--on-surface);
+    font-family: var(--font-inter);
+    line-height: 1.6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 3rem 1rem;
+    -webkit-font-smoothing: antialiased;
+}
+
+.curator-container {
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.curator-header {
+    text-align: center;
+}
+
+/* Typography */
+.serif-title {
+    font-family: var(--font-serif);
+    font-size: 3rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--on-surface);
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+}
+
+.body-text {
+    font-family: var(--font-inter);
+    font-size: 1.125rem;
+    color: var(--on-surface-variant);
+    font-weight: 300;
+    max-width: 65ch;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 4rem;
+}
+
+.label-text {
+    font-family: var(--font-public);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    color: var(--on-surface-variant);
+    margin-bottom: 0.75rem;
+    display: block;
+    text-align: center;
+}
+
+/* Forms and Dropzones */
+.upload-form {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+.form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+@media (min-width: 640px) {
+    .form-grid {
+        flex-direction: row;
+    }
+}
+
+.file-dropzone {
+    flex: 1;
+    min-width: 0;
+}
+
+.file-input {
+    display: none;
+}
+
+.file-label {
+    cursor: pointer;
+    display: block;
+}
+
+.drop-surface {
+    position: relative;
+    background-color: var(--surface-lowest);
+    border: 2px dashed rgba(17, 24, 39, 0.25);
+    padding: 2rem;
+    border-radius: var(--rad-md);
+    text-align: center;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 130px;
+    width: 100%;
+    overflow: hidden;
+}
+
+/* Tonal shift for hover, no borders changed */
+.file-label:hover .drop-surface {
+    background-color: var(--surface-high);
+}
+
+.file-dropzone.dragover .drop-surface {
+    background-color: var(--primary-container);
+    border-color: rgba(9, 76, 178, 0.4);
+}
+
+.file-desc {
+    font-family: var(--font-inter);
+    font-size: 1.15rem;
+    color: var(--on-surface-variant);
+    font-weight: 500;
+}
+
+.file-name {
+    font-family: var(--font-public);
+    font-size: 1.15rem;
+    color: var(--primary);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    width: 100%;
+    text-align: center;
+    display: block;
+}
+
+.file-dropzone.has-file .drop-surface {
+    background-color: var(--surface-dim);
+}
+
+.remove-file-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    color: var(--on-surface-variant);
+    padding: 0.5rem;
+    border-radius: var(--rad-full);
+    display: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.remove-file-btn:hover {
+    color: #991b1b;
+    background-color: rgba(153, 27, 27, 0.1);
+}
+
+.file-dropzone.has-file .remove-file-btn {
+    display: flex;
+}
+
+.file-dropzone.has-file .file-desc {
+    display: none;
+}
+
+/* Buttons */
+.actions {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+}
+
+.btn-primary {
+    background: var(--primary-gradient);
+    color: var(--on-primary);
+    border: none;
+    padding: 1rem 2.5rem;
+    border-radius: var(--rad-full);
+    font-family: var(--font-public);
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    width: 100%;
+}
+
+@media (min-width: 640px) {
+    .btn-primary {
+        width: auto;
+    }
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    opacity: 0.95;
+}
+
+.btn-primary:active {
+    transform: translateY(1px);
+}
+
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Status Notifications */
+.status-message {
+    font-family: var(--font-public);
+    font-size: 0.9rem;
+    color: var(--tertiary);
+    background-color: rgba(109, 94, 0, 0.05);
+    padding: 1rem 1.5rem;
+    border-radius: var(--rad-sm);
+    text-align: center;
+    margin-top: 1rem;
+    font-weight: 500;
+}
+
+.error-message {
+    font-family: var(--font-public);
+    font-size: 0.9rem;
+    color: #991b1b;
+    background-color: #fef2f2;
+    padding: 1rem 1.5rem;
+    border-radius: var(--rad-sm);
+    text-align: center;
+    margin-top: 1rem;
+    border: 1px solid rgba(153, 27, 27, 0.15); /* Exception to 1px rule for critical errors, or we can use ghost border approach */
+    box-shadow: inset 0 0 0 1px rgba(153, 27, 27, 0.15);
+    border: none;
+}
+
+.hidden {
+    display: none !important;
+}
