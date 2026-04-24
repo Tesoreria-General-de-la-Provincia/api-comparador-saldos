@@ -5,7 +5,10 @@ services:
       dockerfile: Dockerfile
     container_name: comparador-saldos-api
     ports:
-      - "8075:8000"
+      - "${API_PORT:-8075}:8000"
+    env_file:
+      - path: .env
+        required: false
     environment:
       - PORT=8000
       - PYTHONDONTWRITEBYTECODE=1
@@ -18,9 +21,10 @@ services:
     image: nginx:alpine
     container_name: comparador-saldos-frontend
     ports:
-      - "3050:80"
+      - "${FRONT_PORT:-3050}:80"
     volumes:
       - ./frontend:/usr/share/nginx/html:ro
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - api
     restart: unless-stopped
