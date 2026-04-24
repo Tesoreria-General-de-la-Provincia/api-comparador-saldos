@@ -111,6 +111,145 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // ---- Modal helpers ----
+    const activeObjectUrls = new Set();
+
+    function createModalElements() {
+        let backdrop = document.getElementById('modal-backdrop');
+        if (backdrop) return backdrop;
+
+        backdrop = document.createElement('div');
+        backdrop.id = 'modal-backdrop';
+        backdrop.className = 'modal-backdrop';
+        backdrop.setAttribute('role', 'presentation');
+
+        const dialog = document.createElement('div');
+        dialog.className = 'modal-dialog';
+        dialog.setAttribute('role', 'dialog');
+        dialog.setAttribute('aria-modal', 'true');
+
+        const header = document.createElement('div');
+        header.className = 'modal-header';
+
+        const title = document.createElement('div');
+        title.className = 'modal-title';
+        title.textContent = 'Archivos generados';
+
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'modal-close';
+        closeBtn.innerHTML = '✕';
+        closeBtn.type = 'button';
+        closeBtn.addEventListener('click', closeModal);
+
+        header.appendChild(title);
+        header.appendChild(closeBtn);
+
+        const body = document.createElement('div');
+        body.className = 'modal-body';
+
+        dialog.appendChild(header);
+        dialog.appendChild(body);
+        backdrop.appendChild(dialog);
+
+        backdrop.addEventListener('click', (ev) => {
+            if (ev.target === backdrop) closeModal();
+        });
+
+        function onKey(e) {
+            if (e.key === 'Escape') closeModal();
+        }
+        backdrop._onKey = onKey;
+        document.addEventListener('keydown', onKey);
+
+        return backdrop;
+    }
+
+    function showModal(files) {
+        const backdrop = createModalElements();
+        const body = backdrop.querySelector('.modal-body');
+
+        body.innerHTML = '';
+        const list = document.createElement('div');
+        list.className = 'download-list';
+        body.appendChild(list);
+
+        files.forEach(file => {
+            const { name, mime, content_base64 } = file;
+            // decode base64
+            const binaryString = atob(content_base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) bytes[i] = binaryString.charCodeAt(i);
+            const blob = new Blob([bytes], { type: mime });
+            const url = window.URL.createObjectURL(blob);
+            activeObjectUrls.add(url);
+
+            // Row container
+            const row = document.createElement('div');
+            row.className = 'file-row';
+            row.setAttribute('role', 'group');
+            row.setAttribute('aria-label', name);
+
+            // Left: icon + name
+            const left = document.createElement('div');
+            left.className = 'file-left';
+
+            const icon = document.createElement('div');
+            icon.className = 'file-icon';
+            // small SVG icon for xlsx (simple shape)
+            icon.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M7 8h10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 12h10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+            const nameEl = document.createElement('div');
+            nameEl.className = 'file-name';
+            nameEl.textContent = name;
+
+            left.appendChild(icon);
+            left.appendChild(nameEl);
+
+            // Right: download button
+            const btn = document.createElement('a');
+            btn.className = 'btn-download';
+            // Keep visual button consistent with .btn-primary colors
+            btn.classList.add('btn-primary');
+            btn.href = url;
+            btn.download = name;
+            btn.textContent = 'Descargar';
+
+            btn.addEventListener('click', () => setTimeout(() => {
+                window.URL.revokeObjectURL(url);
+                activeObjectUrls.delete(url);
+            }, 10000));
+
+            row.appendChild(left);
+            row.appendChild(btn);
+            list.appendChild(row);
+        });
+
+        if (!document.getElementById('modal-backdrop')) {
+            document.body.appendChild(backdrop);
+        }
+
+        const closeBtn = backdrop.querySelector('.modal-close');
+        if (closeBtn) closeBtn.focus();
+
+        document.body.classList.add('modal-open');
+    }
+
+    function closeModal() {
+        activeObjectUrls.forEach(url => {
+            try { window.URL.revokeObjectURL(url); } catch (e) {}
+        });
+        activeObjectUrls.clear();
+
+        const backdrop = document.getElementById('modal-backdrop');
+        if (!backdrop) return;
+
+        if (backdrop._onKey) document.removeEventListener('keydown', backdrop._onKey);
+
+        backdrop.remove();
+        document.body.classList.remove('modal-open');
+    }
+
     // Form submission
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -150,35 +289,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(errorDetails);
             }
 
-            // Successfully received the ZIP file
-            const blob = await response.blob();
-            
-            // Extract filename from Content-Disposition header if possible
-            let filename = "comparacion_saldos.zip";
-            const disposition = response.headers.get('Content-Disposition');
-            if (disposition && disposition.indexOf('attachment') !== -1) {
-                const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-                const matches = filenameRegex.exec(disposition);
-                if (matches != null && matches[1]) { 
-                    filename = matches[1].replace(/['"]/g, '');
-                }
-            }
+            // Successfully received JSON with both Excel files encoded in base64
+            const json = await response.json();
 
-            // Create download link
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = filename;
-            
-            document.body.appendChild(a);
-            a.click();
-            
-            // Cleanup
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-            
-            // Reset form
+            // Mostrar modal centrado con los archivos
+            showModal(json.files);
+
+            // Reset form (we keep the download links visible)
             form.reset();
             inputs.forEach(item => {
                 item.nameDisplay.textContent = '';

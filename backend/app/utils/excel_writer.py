@@ -10,7 +10,9 @@ from io import BytesIO
 import numpy as np
 
 
-def dataframe_to_excel_bytes(df: pd.DataFrame, sheet_name: str = "Sheet1") -> bytes:
+def dataframe_to_excel_bytes(
+    df: pd.DataFrame, sheet_name: str = "Sheet1", currency_cols: set[str] | None = None
+) -> bytes:
     """
     Convierte un DataFrame a bytes de archivo Excel (.xlsx).
 
@@ -86,9 +88,16 @@ def dataframe_to_excel_bytes(df: pd.DataFrame, sheet_name: str = "Sheet1") -> by
                     if np.isnan(value):
                         cell.value = None
                     else:
+                        # mantener el valor numérico tal cual para que Excel lo formatee
                         cell.value = float(value)
                 else:
                     cell.value = value
+
+                # Aplicar formateo de moneda nativo de Excel si corresponde
+                if currency_cols:
+                    header_col_name = headers[col_idx - 1]
+                    if header_col_name in currency_cols and cell.value is not None:
+                        cell.number_format = '$#,##0.00'
             # Valores string
             else:
                 cell.value = str(value)
@@ -154,10 +163,22 @@ def create_comparison_excels(
         ...     f.write(excel2)
     """
     print(f"Generando Excel completo con {len(df_completa)} registros...")
-    excel_completa = dataframe_to_excel_bytes(df_completa, "Sheet1")
+
+    # Columnas a formatear como moneda en Excel
+    currency_cols = {"INGRESOS", "EGRESOS", "SALDOFIN_2025", "SALDO_INI_2026", "DIFERENCIA"}
+
+    # Trabajar sobre copias para no mutar los DataFrames originales
+    df_comp_for_xlsx = df_completa.copy()
+    df_exist_for_xlsx = df_existentes.copy()
+
+    # Eliminar SALDO_INI sólo en las copias que se van a escribir
+    df_comp_for_xlsx = df_comp_for_xlsx.drop(columns=["SALDO_INI"], errors="ignore")
+    df_exist_for_xlsx = df_exist_for_xlsx.drop(columns=["SALDO_INI"], errors="ignore")
+
+    excel_completa = dataframe_to_excel_bytes(df_comp_for_xlsx, "Sheet1", currency_cols=currency_cols)
 
     print(f"Generando Excel de existentes con {len(df_existentes)} registros...")
-    excel_existentes = dataframe_to_excel_bytes(df_existentes, "Sheet1")
+    excel_existentes = dataframe_to_excel_bytes(df_exist_for_xlsx, "Sheet1", currency_cols=currency_cols)
 
     return excel_completa, excel_existentes
 

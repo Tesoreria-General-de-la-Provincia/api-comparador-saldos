@@ -78,16 +78,30 @@ Una vez iniciada la API, accede a:
 
 ### Endpoint Principal: POST /api/compare
 
-Compara dos archivos CSV y genera un ZIP con los archivos Excel de comparación.
+Compara dos archivos CSV y devuelve en la respuesta JSON ambos archivos Excel codificados en base64.
 
-#### Usando Swagger UI
+#### Formato de respuesta
 
-1. Accede a http://localhost:8000/docs
-2. Expande el endpoint `POST /api/compare`
-3. Click en "Try it out"
-4. Selecciona los archivos CSV
-5. Click en "Execute"
-6. Descarga el archivo ZIP generado
+La respuesta será JSON con la estructura:
+
+```json
+{
+  "year1": "2025",
+  "year2": "2026",
+  "files": [
+    {
+      "name": "comparacion_completa_2025_2026.xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "content_base64": "UEsDB..."
+    },
+    {
+      "name": "comparacion_existentes_2025_2026.xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "content_base64": "UEsDB..."
+    }
+  ]
+}
+```
 
 #### Usando cURL
 
@@ -95,31 +109,24 @@ Compara dos archivos CSV y genera un ZIP con los archivos Excel de comparación.
 curl -X POST "http://localhost:8000/api/compare" \
   -F "file_year1=@csv/2025.CSV" \
   -F "file_year2=@csv/2026.CSV" \
-  -o resultado.zip
+  -o response.json
 ```
+
+Luego decodifica los archivos base64 con la herramienta de tu preferencia.
 
 #### Usando Python (requests)
 
 ```python
-import requests
+import requests, base64
 
 url = "http://localhost:8000/api/compare"
-
 with open('csv/2025.CSV', 'rb') as f1, open('csv/2026.CSV', 'rb') as f2:
-    files = {
-        'file_year1': f1,
-        'file_year2': f2
-    }
-    
+    files = {'file_year1': f1, 'file_year2': f2}
     response = requests.post(url, files=files)
-    
-    if response.status_code == 200:
-        with open('resultado.zip', 'wb') as output:
-            output.write(response.content)
-        print("✅ Archivos generados exitosamente")
-    else:
-        print(f"❌ Error: {response.status_code}")
-        print(response.json())
+    data = response.json()
+    for f in data['files']:
+        with open(f['name'], 'wb') as out:
+            out.write(base64.b64decode(f['content_base64']))
 ```
 
 #### Usando JavaScript (Fetch API)
@@ -133,13 +140,9 @@ fetch('http://localhost:8000/api/compare', {
     method: 'POST',
     body: formData
 })
-.then(response => response.blob())
-.then(blob => {
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'comparacion_saldos.zip';
-    a.click();
+.then(response => response.json())
+.then(json => {
+    // json.files contiene los archivos codificados en base64
 });
 ```
 

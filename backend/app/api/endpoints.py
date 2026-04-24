@@ -3,10 +3,10 @@ Endpoints de la API REST para comparación de saldos.
 """
 
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse
 import logging
 from io import BytesIO
-from zipfile import ZipFile, ZIP_DEFLATED
+import base64
 
 from app.utils.csv_reader import read_csv_file
 from app.services.comparison_service import compare_dataframes, get_comparison_summary
@@ -22,7 +22,7 @@ router = APIRouter()
 @router.post(
     "/compare",
     summary="Compara dos archivos CSV de diferentes años",
-    description="Recibe dos archivos CSV y genera un ZIP con dos Excel de comparación",
+    description="Recibe dos archivos CSV y retorna ambos archivos Excel en JSON codificados en base64",
 )
 async def compare_csv_files(
     file_year1: UploadFile = File(
@@ -40,17 +40,17 @@ async def compare_csv_files(
     4. Genera dos archivos Excel:
        - `comparacion_completa.xlsx`: Todas las diferencias (NUEVA, EXISTENTE, ELIMINADA)
        - `comparacion_existentes.xlsx`: Solo cuentas EXISTENTES con diferencias
-    5. Retorna un archivo ZIP con ambos Excel
+    5. Retorna ambos archivos como JSON (base64)
 
     **Parámetros:**
     - **file_year1**: Archivo CSV del año anterior
     - **file_year2**: Archivo CSV del año actual
 
     **Retorna:**
-    - Archivo ZIP conteniendo los dos archivos Excel
+    - JSON con los dos archivos Excel codificados en base64
 
     **Códigos de estado:**
-    - 200: Éxito, retorna ZIP
+    - 200: Éxito, retorna JSON con los archivos
     - 400: Error de validación
     - 422: Error de formato
     - 500: Error interno
@@ -126,22 +126,34 @@ async def compare_csv_files(
                 status_code=500, detail=f"Error al generar archivos Excel: {str(e)}"
             )
 
-        # PASO 5: Crear ZIP con ambos archivos
+        # PASO 5: Preparar respuesta con ambos archivos en base64 (sin ZIP)
         try:
-            logger.info("Creando archivo ZIP...")
-            zip_buffer = BytesIO()
+            logger.info("Preparando respuesta con ambos archivos Excel (base64)...")
 
-            with ZipFile(zip_buffer, "w", ZIP_DEFLATED) as zip_file:
-                zip_file.writestr("comparacion_completa.xlsx", excel_completa)
-                zip_file.writestr("comparacion_existentes.xlsx", excel_existentes)
+            file1_name = f"comparacion_completa_{year1}_{year2}.xlsx"
+            file2_name = f"comparacion_existentes_{year1}_{year2}.xlsx"
 
-            zip_buffer.seek(0)
-            logger.info("Archivo ZIP creado exitosamente")
+            resp = {
+                "year1": year1,
+                "year2": year2,
+                "files": [
+                    {
+                        "name": file1_name,
+                        "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        "content_base64": base64.b64encode(excel_completa).decode("ascii"),
+                    },
+                    {
+                        "name": file2_name,
+                        "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        "content_base64": base64.b64encode(excel_existentes).decode("ascii"),
+                    },
+                ],
+            }
 
         except Exception as e:
-            logger.error(f"Error al crear ZIP: {str(e)}", exc_info=True)
+            logger.error(f"Error al preparar respuesta: {str(e)}", exc_info=True)
             raise HTTPException(
-                status_code=500, detail=f"Error al crear archivo ZIP: {str(e)}"
+                status_code=500, detail=f"Error al preparar archivos: {str(e)}"
             )
 
         # PASO 6: Generar resumen (opcional, para logs)
@@ -151,14 +163,8 @@ async def compare_csv_files(
         except Exception as e:
             logger.warning(f"No se pudo generar resumen: {str(e)}")
 
-        # PASO 7: Retornar ZIP como descarga
-        filename = f"comparacion_saldos_{year1}_{year2}.zip"
-
-        return StreamingResponse(
-            BytesIO(zip_buffer.getvalue()),
-            media_type="application/zip",
-            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
-        )
+        # PASO 7: Retornar JSON con los dos archivos codificados en base64
+        return JSONResponse(content=resp)
 
     except HTTPException:
         # Re-lanzar HTTPExceptions tal cual
