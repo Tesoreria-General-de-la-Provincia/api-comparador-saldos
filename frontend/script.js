@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // API Configuration
-    const API_URL = 'http://10.6.10.157:8075/api/compare';
+    const API_URL = 'http://10.6.149.155:8075/api/compare';
 
 
     // UI Elements
